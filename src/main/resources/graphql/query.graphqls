@@ -1,0 +1,82 @@
+type Query {
+    getStudent(id: ID): Student
+    allStudents(term: String, page: Int, size: Int): [Student]
+    registerUser(register: RegisterInput): AuthenticationResponse
+    authenticate(authentication: AuthenticationInput): AuthenticationResponse
+    getMembership(id: ID): Membership
+    addMembership(membership: MembershipInput): Membership
+    updateMembership(id: ID, membership: MembershipInput): Membership
+    allStudentRoles: [StudentRoles]
+}
+
+type Mutation {
+    addStudent(student: StudentInput): Student
+}
+
+type Register {
+    firstName: String
+    lastName: String
+    email: String
+    password: String
+    role: String
+}
+
+type Student {
+    id: ID
+    createdAt: String
+    modifiedAt: String
+    modifiedBy: String
+    deleted: Boolean
+    firstName: String
+    lastName: String
+    age: Int
+    studentRole: String
+}
+
+type Authentication {
+    email: String
+    password: String
+}
+
+type AuthenticationResponse {
+    accessToken: String
+    refreshToken: String
+}
+
+type Membership {
+    name: String
+    price: Float
+    active: Boolean
+}
+
+type StudentRoles {
+    id: ID
+    name: String
+}
+
+input AuthenticationInput {
+    email: String
+    password: String
+}
+
+input StudentInput {
+    firstName: String
+    lastName: String
+    age: Int
+    studentRole: String
+}
+
+input RegisterInput {
+    firstName: String
+    lastName: String
+    email: String
+    password: String
+    role: String
+}
+
+input MembershipInput{
+    name: String
+    price: Float
+    active: Boolean
+}
+
