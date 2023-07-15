@@ -1,16 +1,30 @@
 type Query {
     getStudent(id: ID): Student
-    allStudents(term: String, page: Int, size: Int): [Student]
-    registerUser(register: RegisterInput): AuthenticationResponse
-    authenticate(authentication: AuthenticationInput): AuthenticationResponse
-    getMembership(id: ID): Membership
-    addMembership(membership: MembershipInput): Membership
-    updateMembership(id: ID, membership: MembershipInput): Membership
     allStudentRoles: [StudentRoles]
+    allStudents(search: SearchInput): [Student]
+    allPayments(search: SearchInput): [Payment]
+    allDues(search: SearchInput): [Due]
+    allWorkshops(search: SearchInput): [Workshop]
+    allRepresentatives(search: SearchInput): [Representative]
+    allRegistrations(search: SearchInput): [Registration]
+    tokenIsValid(token: String): Boolean
 }
 
 type Mutation {
     addStudent(student: StudentInput): Student
+    updateStudent(student: StudentInput): Student
+    addWorkshop(workshop: WorkshopInput): Workshop
+    updateWorkshop(workshop: WorkshopInput): Workshop
+    addRepresentative(representative: RepresentativeInput): Representative
+    updateRepresentative(representative: RepresentativeInput): Representative
+    addRegistration(registration: RegistrationInput): Registration
+    allDuesByStudentId(studentId: String): [Due]
+    payDues(dueIds: [String]):[Due]
+    registerUser(register: RegisterInput): AuthenticationResponse
+    authenticate(authentication: AuthenticationInput): AuthenticationResponse
+    refreshToken: AuthenticationResponse
+    logout(token: String): Boolean
+    addPayment(payment: PaymentInput): Payment
 }
 
 type Register {
@@ -29,8 +43,10 @@ type Student {
     deleted: Boolean
     firstName: String
     lastName: String
+    fullName: String
     age: Int
-    studentRole: String
+    dni: String
+    email: String
 }
 
 type Authentication {
@@ -43,15 +59,48 @@ type AuthenticationResponse {
     refreshToken: String
 }
 
-type Membership {
-    name: String
-    price: Float
-    active: Boolean
-}
-
 type StudentRoles {
     id: ID
     name: String
+}
+type Representative {
+    id: ID
+    name: String
+    studentName: String
+}
+
+type Payment {
+    id: ID
+    studentId: String
+    studentName: String
+    mode: String
+    amount: Float
+}
+
+type Workshop {
+    id: ID
+    name: String
+    schedule: [String]
+    price: Float
+}
+
+type Registration {
+    id: ID
+    student: Student
+    workshopName: String
+    schedule: String
+}
+
+type Due {
+    id: ID
+    studentId: String
+    amount: Float
+    name: String
+    status: String
+    creationDate: String
+    dueDate: String
+    registrationId: String
+    workshopName: String
 }
 
 input AuthenticationInput {
@@ -60,10 +109,14 @@ input AuthenticationInput {
 }
 
 input StudentInput {
+    id: ID
     firstName: String
     lastName: String
+    fullName: String
     age: Int
-    studentRole: String
+    dni: String
+    email: String
+    deleted: Boolean
 }
 
 input RegisterInput {
@@ -74,9 +127,45 @@ input RegisterInput {
     role: String
 }
 
-input MembershipInput{
+input RepresentativeInput{
+    id: ID
     name: String
-    price: Float
-    active: Boolean
+    studentName: String
+    deleted: Boolean
+}
+input SearchInput {
+    term: String
+    page: Int
+    size: Int
 }
 
+input PaymentInput {
+    studentId: String
+    studentName: String
+    amount: Float
+    mode: String
+}
+
+input WorkshopInput {
+    id: ID
+    name: String
+    schedule: [String]
+    price: Float
+    deleted: Boolean
+}
+
+input RegistrationInput {
+    student: StudentInput
+    workshopName: String
+    schedule: String
+}
+
+input DueInput {
+    studentId: String
+    amount: Float
+    name: String
+    status: String
+    creationDate: String
+    dueDate: String
+    registrationId: String
+}

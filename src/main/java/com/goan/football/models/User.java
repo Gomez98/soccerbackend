@@ -25,7 +25,6 @@ public class User extends BaseModel implements UserDetails{
     private String email;
     private String password;
     private Role role;
-    private List<Token> tokens;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

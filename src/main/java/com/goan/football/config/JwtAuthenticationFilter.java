@@ -1,12 +1,15 @@
 package com.goan.football.config;
 
 import com.goan.football.repositories.TokenRepository;
+import com.goan.football.utils.CachingHttpServletRequestWrapper;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequestWrapper;
 import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
+import java.util.stream.Collectors;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -34,13 +37,27 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             @NonNull HttpServletResponse response,
             @NonNull FilterChain filterChain
     ) throws ServletException, IOException {
-        final String authHeader = request.getHeader("Authorization");
+
+        HttpServletRequest wrappedRequest = new CachingHttpServletRequestWrapper(request);
+        if (shouldExcludeAuthenticationFilter(wrappedRequest, "authenticate")) {
+            filterChain.doFilter(wrappedRequest, response);
+            return;
+        }
+        if (shouldExcludeAuthenticationFilter(wrappedRequest, "logout")) {
+            filterChain.doFilter(wrappedRequest, response);
+            return;
+        }
+        if (shouldExcludeAuthenticationFilter(wrappedRequest, "tokenIsValid")) {
+            filterChain.doFilter(wrappedRequest, response);
+            return;
+        }
+
+        final String authHeader = wrappedRequest.getHeader("Authorization");
         final String jwt;
         final String userEmail;
         log.info("authHeader : " + authHeader);
-        if (authHeader == null ||!authHeader.startsWith("Bearer ")) {
-
-            filterChain.doFilter(request, response);
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            filterChain.doFilter(wrappedRequest, response);
             return;
         }
         jwt = authHeader.substring(7);
@@ -56,12 +73,21 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                         null,
                         userDetails.getAuthorities()
                 );
-                authToken.setDetails(
-                        new WebAuthenticationDetailsSource().buildDetails(request)
-                );
+                authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(wrappedRequest));
                 SecurityContextHolder.getContext().setAuthentication(authToken);
             }
         }
-        filterChain.doFilter(request, response);
+        filterChain.doFilter(wrappedRequest, response);
+
+    }
+
+    private boolean shouldExcludeAuthenticationFilter(HttpServletRequest request, String methodName) throws IOException {
+        if (request instanceof HttpServletRequestWrapper) {
+            HttpServletRequestWrapper wrapper = (HttpServletRequestWrapper) request;
+            String requestPayload = wrapper.getReader().lines().collect(Collectors.joining(System.lineSeparator()));
+            String authenticateFieldName = methodName;
+            return requestPayload.contains(authenticateFieldName);
+        }
+        return false;
     }
 }

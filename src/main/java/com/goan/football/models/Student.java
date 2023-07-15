@@ -8,8 +8,9 @@ import org.springframework.data.mongodb.core.mapping.Document;
 public class Student extends BaseModel{
     String firstName;
     String lastName;
+    String fullName;
     Integer age;
-    String studentRole;
-    String membershipName;
-    Double payment;
+    String dni;
+    String email;
+    Boolean active;
 }

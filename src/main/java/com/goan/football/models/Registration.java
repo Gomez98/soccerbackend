@@ -5,10 +5,8 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 @Data
 @Document
-public class Membership {
-
-    String id;
-    String name;
-    Double price;
-    Boolean active;
+public class Registration extends BaseModel{
+    Student student;
+    String workshopName;
+    String schedule;
 }

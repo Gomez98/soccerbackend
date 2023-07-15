@@ -5,7 +5,12 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 @Data
 @Document
-public class Representative extends BaseModel{
-    String name;
+public class Payment extends BaseModel {
+
+    String studentId;
     String studentName;
+    String mode;
+    Double amount;
+
 }
+

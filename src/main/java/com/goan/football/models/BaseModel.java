@@ -8,5 +8,5 @@ public class BaseModel {
     String createdAt;
     String modifiedAt;
     String modifiedBy;
-    boolean deleted;
+    Boolean deleted;
 }

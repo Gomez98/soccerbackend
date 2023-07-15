@@ -1,10 +1,12 @@
 package com.goan.football.controllers;
 
 import com.goan.football.models.Representative;
+import com.goan.football.models.Search;
 import com.goan.football.services.RepresentativeService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.graphql.data.method.annotation.Argument;
+import org.springframework.graphql.data.method.annotation.MutationMapping;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
@@ -16,14 +18,20 @@ import java.util.List;
 @Slf4j
 public class RepresentativeController {
 
-
     private final RepresentativeService representativeService;
 
-    @QueryMapping
-    @PreAuthorize("hasAuthority('admin:write')")
+    @MutationMapping
+    @PreAuthorize("hasAuthority('admin:create')")
     public Representative addRepresentative(@Argument Representative representative){
         return representativeService.save(representative);
     }
+
+    @MutationMapping
+    @PreAuthorize("hasAuthority('admin:create')")
+    public Representative updateRepresentative(@Argument Representative representative){
+        return representativeService.update(representative);
+    }
+
 
     @QueryMapping
     @PreAuthorize("hasAuthority('admin:read')")
@@ -33,8 +41,8 @@ public class RepresentativeController {
 
     @QueryMapping
     @PreAuthorize("hasAuthority('admin:read')")
-    public List<Representative> allRepresentatives(@Argument String term, @Argument int page, @Argument int size){
-        return representativeService.all(term, page, size);
+    public List<Representative> allRepresentatives(@Argument Search search){
+        return representativeService.all(search);
     }
 
 }

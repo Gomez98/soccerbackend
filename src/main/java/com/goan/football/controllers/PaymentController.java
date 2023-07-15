@@ -1,8 +1,9 @@
 package com.goan.football.controllers;
 
+import com.goan.football.models.Payment;
 import com.goan.football.models.Search;
 import com.goan.football.models.Student;
-import com.goan.football.services.StudentService;
+import com.goan.football.services.PaymentService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.graphql.data.method.annotation.Argument;
@@ -15,34 +16,20 @@ import java.util.List;
 
 @Controller
 @AllArgsConstructor
-@Slf4j
+public class PaymentController {
 
-public class StudentController {
-
-    private final StudentService studentService;
+    private final PaymentService paymentService;
 
     @MutationMapping
     @PreAuthorize("hasAuthority('admin:create')")
-    public Student addStudent(@Argument Student student){
-        return studentService.save(student);
-    }
-
-    @MutationMapping
-    @PreAuthorize("hasAuthority('admin:create')")
-    public Student updateStudent(@Argument Student student){
-        return studentService.update(student);
-    }
-
-    @QueryMapping
-    //@PreAuthorize("hasAuthority('admin:read')")
-    public Student getStudent(@Argument String id){
-        return studentService.get(id);
+    public Payment addPayment(@Argument Payment payment){
+        return paymentService.save(payment);
     }
 
     @QueryMapping
     @PreAuthorize("hasAuthority('admin:read')")
-    public List<Student> allStudents(@Argument Search search){
-        return studentService.all(search);
+    public List<Payment> allPayments(@Argument Search search){
+        return paymentService.all(search);
     }
 
 }

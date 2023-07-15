@@ -1,10 +1,6 @@
 package com.goan.football.services.impl;
 
-import com.goan.football.models.Membership;
-import com.goan.football.models.Student;
-import com.goan.football.models.StudentRole;
-import com.goan.football.models.StudentRoleName;
-import com.goan.football.repositories.MembershipRepository;
+import com.goan.football.models.*;
 import com.goan.football.repositories.StudentRepository;
 import com.goan.football.services.StudentService;
 import lombok.AllArgsConstructor;
@@ -16,8 +12,12 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
+
+import static com.goan.football.utils.ModelUtils.prepare;
 
 
 @Service
@@ -26,25 +26,37 @@ import java.util.List;
 public class StudentServiceImpl implements StudentService {
 
     private final StudentRepository studentRepository;
-    private final MembershipRepository membershipRepository;
-
 
     @Override
     public Student save(Student student) {
-        student.setCreatedAt(String.valueOf(new Date().getTime()));
-        student.setModifiedAt(String.valueOf(new Date().getTime()));
-        student.setDeleted(false);
-        Membership membership = membershipRepository.findByActive(true).orElse(null);
-        if (membership == null){
+        prepare(student);
+        student.setFullName(student.getFirstName() + " " + student.getLastName());
+        student.setActive(true);
+        return studentRepository.save(student);
+    }
+
+    @Override
+    public Student update(Student entity) {
+
+        if (entity == null) {
             return null;
         }
-        if (student.getStudentRole() == StudentRoleName.BASIC_STUDENT.name()){
-            student.setPayment(membership.getPrice() * 0.9);
+        if (entity.getId() == null) {
+            return null;
         }
-        if (student.getStudentRole() == StudentRoleName.PRO_STUDENT.name()){
-            student.setPayment(membership.getPrice() * 0.75);
+        Student student = studentRepository.findById(entity.getId()).orElse(null);
+        if(student != null){
+            student.setDeleted(entity.getDeleted() != null ? entity.getDeleted() : student.getDeleted());
+            student.setAge(entity.getAge() != null ? entity.getAge() : student.getAge());
+            student.setDni(entity.getDni() != null ? entity.getDni() : student.getDni());
+            student.setEmail(entity.getEmail() != null ? entity.getEmail() : student.getEmail());
+            student.setFirstName(entity.getFirstName() != null ? entity.getFirstName() : student.getFirstName());
+            student.setLastName(entity.getLastName() != null ? entity.getLastName() : student.getLastName());
+            student.setFullName(entity.getFullName() != null ? entity.getFullName() : student.getFirstName() + entity.getLastName());
+            student.setModifiedAt(String.valueOf(new Date().getTime()));
+            return studentRepository.save(student);
         }
-        return studentRepository.save(student);
+        return null;
     }
 
     @Override
@@ -55,9 +67,46 @@ public class StudentServiceImpl implements StudentService {
     }
 
     @Override
-    public List<Student> all(String term, int page, int size) {
-        Pageable pageable = PageRequest.of(page, size, Sort.by("name").ascending());
-        Page<Student> studentPage =studentRepository.findAllByName(term, pageable);
-        return studentPage.get().toList();
+    public List<Student> all(Search search) {
+
+        List<Student> students;
+        String term = null;
+        Integer page = null;
+        Integer size = null;
+
+        if (search != null && search.getTerm() != null) {
+            term = search.getTerm();
+        }
+        if (search != null && search.getPage() != null) {
+            page = search.getPage();
+        }
+        if (search != null && search.getSize() != null) {
+            size = search.getSize();
+        }
+
+        if (page == null && size == null && term == null){
+            students = studentRepository.findAll()
+                    .stream()
+                    .sorted(Comparator.comparing(Student::getModifiedAt).reversed())
+                    .collect(Collectors.toList());
+        } else if (page != null && size !=null){
+            if (term == null){
+                term = "";
+            }
+            Pageable pageable = PageRequest.of(page, size, Sort.by("name").ascending());
+            Page<Student> studentPage = studentRepository.findAllByName(term, pageable);
+            students = studentPage.get().toList();
+        } else {
+            students = studentRepository.findAllByName(term);
+        }
+
+        students = students.stream().filter(s -> !s.getDeleted()).collect(Collectors.toList());
+        return students;
     }
+
+    @Override
+    public List<Student> all(String id) {
+        return null;
+    }
+
 }

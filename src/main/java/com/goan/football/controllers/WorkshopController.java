@@ -2,9 +2,9 @@ package com.goan.football.controllers;
 
 import com.goan.football.models.Search;
 import com.goan.football.models.Student;
-import com.goan.football.services.StudentService;
+import com.goan.football.models.Workshop;
+import com.goan.football.services.WorkshopService;
 import lombok.AllArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
@@ -15,34 +15,33 @@ import java.util.List;
 
 @Controller
 @AllArgsConstructor
-@Slf4j
+public class WorkshopController {
 
-public class StudentController {
-
-    private final StudentService studentService;
+    private final WorkshopService workshopService;
 
     @MutationMapping
     @PreAuthorize("hasAuthority('admin:create')")
-    public Student addStudent(@Argument Student student){
-        return studentService.save(student);
+    public Workshop addWorkshop(@Argument Workshop workshop){
+        return workshopService.save(workshop);
     }
 
     @MutationMapping
     @PreAuthorize("hasAuthority('admin:create')")
-    public Student updateStudent(@Argument Student student){
-        return studentService.update(student);
+    public Workshop updateWorkshop(@Argument Workshop workshop){
+        return workshopService.update(workshop);
     }
 
     @QueryMapping
     //@PreAuthorize("hasAuthority('admin:read')")
-    public Student getStudent(@Argument String id){
-        return studentService.get(id);
+    public Workshop getWorkshop(@Argument String id){
+        return workshopService.get(id);
     }
 
     @QueryMapping
     @PreAuthorize("hasAuthority('admin:read')")
-    public List<Student> allStudents(@Argument Search search){
-        return studentService.all(search);
+    public List<Workshop> allWorkshops(@Argument Search search){
+        return workshopService.all(search);
     }
+
 
 }

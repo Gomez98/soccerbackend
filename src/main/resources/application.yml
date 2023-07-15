@@ -1,5 +1,9 @@
 #file: noinspection undefined
 spring:
+  task:
+    scheduling:
+      pool:
+        size: 5
   graphql:
     graphiql:
       enabled: true
@@ -17,3 +21,4 @@ application:
       expiration: 86400000 # a day
       refresh-token:
         expiration: 604800000 # 7 days
+
