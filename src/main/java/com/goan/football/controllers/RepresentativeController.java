@@ -16,31 +16,29 @@ import java.util.List;
 @Controller
 @AllArgsConstructor
 @Slf4j
+@PreAuthorize("hasRole('ADMIN')")
 public class RepresentativeController {
 
     private final RepresentativeService representativeService;
 
     @MutationMapping
-    @PreAuthorize("hasAuthority('admin:create')")
     public Representative addRepresentative(@Argument Representative representative){
         return representativeService.save(representative);
     }
 
     @MutationMapping
-    @PreAuthorize("hasAuthority('admin:create')")
     public Representative updateRepresentative(@Argument Representative representative){
         return representativeService.update(representative);
     }
 
-
     @QueryMapping
-    @PreAuthorize("hasAuthority('admin:read')")
+    @PreAuthorize("hasAnyAuthority('user:read', 'admin:read')")
     public Representative getRepresentative(@Argument String id){
         return representativeService.get(id);
     }
 
     @QueryMapping
-    @PreAuthorize("hasAuthority('admin:read')")
+    @PreAuthorize("hasAnyAuthority('user:read', 'admin:read')")
     public List<Representative> allRepresentatives(@Argument Search search){
         return representativeService.all(search);
     }

@@ -16,31 +16,29 @@ import java.util.List;
 @Controller
 @AllArgsConstructor
 @Slf4j
-
+@PreAuthorize("hasRole('ADMIN')")
 public class StudentController {
 
     private final StudentService studentService;
 
     @MutationMapping
-    @PreAuthorize("hasAuthority('admin:create')")
     public Student addStudent(@Argument Student student){
         return studentService.save(student);
     }
 
     @MutationMapping
-    @PreAuthorize("hasAuthority('admin:create')")
     public Student updateStudent(@Argument Student student){
         return studentService.update(student);
     }
 
     @QueryMapping
-    //@PreAuthorize("hasAuthority('admin:read')")
+    @PreAuthorize("hasAnyAuthority('user:read', 'admin:read')")
     public Student getStudent(@Argument String id){
         return studentService.get(id);
     }
 
     @QueryMapping
-    @PreAuthorize("hasAuthority('admin:read')")
+    @PreAuthorize("hasAnyAuthority('user:read', 'admin:read')")
     public List<Student> allStudents(@Argument Search search){
         return studentService.all(search);
     }
