@@ -22,7 +22,8 @@ public class RepresentativeServiceImpl implements RepresentativeService {
 
     @Override
     public Representative save(Representative representative) {
-        //TODO: Agregar cambios de auditoria
+        representative.setDeleted(false);
+        representative.setModifiedAt(String.valueOf(new Date().getTime()));
         return representativeRepository.save(representative);
     }
 

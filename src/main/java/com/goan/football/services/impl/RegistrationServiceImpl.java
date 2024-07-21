@@ -74,6 +74,7 @@ public class RegistrationServiceImpl implements RegistrationService {
         return null;
     }
 
+    //
     @Scheduled(cron = "0 0 2 * * *")
     private void generateDueForStudents() {
         log.info("Generating dues for students");
