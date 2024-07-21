@@ -87,6 +87,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             String requestPayload = wrapper.getReader().lines().collect(Collectors.joining(System.lineSeparator()));
             String authenticateFieldName = methodName;
             return requestPayload.contains(authenticateFieldName);
+
         }
         return false;
     }
