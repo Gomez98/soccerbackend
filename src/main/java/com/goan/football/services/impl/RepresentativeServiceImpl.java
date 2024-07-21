@@ -22,6 +22,7 @@ public class RepresentativeServiceImpl implements RepresentativeService {
 
     @Override
     public Representative save(Representative representative) {
+        //TODO: Agregar cambios de auditoria
         return representativeRepository.save(representative);
     }
 

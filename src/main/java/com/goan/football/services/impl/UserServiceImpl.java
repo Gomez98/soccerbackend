@@ -1,11 +1,16 @@
 package com.goan.football.services.impl;
 
+import com.goan.football.config.JwtService;
 import com.goan.football.models.Search;
 import com.goan.football.models.User;
+import com.goan.football.models.token.Token;
+import com.goan.football.models.token.TokenType;
+import com.goan.football.repositories.TokenRepository;
 import com.goan.football.repositories.UserRepository;
 import com.goan.football.services.UserService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
@@ -21,10 +26,18 @@ import static com.goan.football.utils.ModelUtils.prepare;
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
+    private final JwtService jwtService;
+    private final TokenRepository tokenRepository;
+
 
     @Override
     public User save(User entity) {
         prepare(entity);
+        entity.setPassword(passwordEncoder.encode(entity.getPassword()));
+        var savedUser = userRepository.save(entity);
+        var jwtToken = jwtService.generateToken(entity);
+        saveUserToken(savedUser, jwtToken);
         return userRepository.save(entity);
     }
 
@@ -65,5 +78,16 @@ public class UserServiceImpl implements UserService {
     @Override
     public List<User> all(String id) {
         return null;
+    }
+
+    private void saveUserToken(User user, String jwtToken) {
+        var token = Token.builder()
+                .user(user)
+                .token(jwtToken)
+                .tokenType(TokenType.BEARER)
+                .expired(false)
+                .revoked(false)
+                .build();
+        tokenRepository.save(token);
     }
 }

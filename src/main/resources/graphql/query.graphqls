@@ -188,4 +188,5 @@ input UserInput {
     lastName: String
     email: String
     role: String
+    password: String
 }
