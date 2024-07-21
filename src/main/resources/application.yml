@@ -12,7 +12,7 @@ spring:
   data:
     mongodb:
       database: football
-      uri: mongodb://localhost:27017
+      uri: "mongodb+srv://sistemas:u7ubSAQugdF5Sd4y@yohersa-cluster0.zubfzw7.mongodb.net"
 
 application:
   security:
